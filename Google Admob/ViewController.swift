@@ -7,19 +7,49 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
-class ViewController: UIViewController {
-
+class ViewController: UIViewController, GADBannerViewDelegate, GADInterstitialDelegate {
+    
+    @IBOutlet weak var bannerView: GADBannerView!
+    var interstitial: GADInterstitial!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        bannerView.delegate = self
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+        
+        interstitial = createAndLoad()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        print(#function)
     }
-
-
+    
+    @IBAction func show(_ sender: Any) {
+        if interstitial.isReady{
+            interstitial.present(fromRootViewController: self)
+        } else {
+            print("Ad isn't ready")
+        }
+    }
+    
+    func createAndLoad() -> GADInterstitial {
+        var interstitial = GADInterstitial(adUnitID: "ca-app-pub-3940256099942544/4411468910")
+        interstitial.delegate = self
+        interstitial.load(GADRequest())
+        return interstitial
+    }
+    
+    func interstitialDidDismissScreen(_ ad: GADInterstitial) {
+        interstitial = createAndLoad()
+    }
+    
+    func interstitialDidReceiveAd(_ ad: GADInterstitial) {
+        print("interstitialDidReceiveAd")
+    }
+    
 }
 
